@@ -1,0 +1,73 @@
+:root {
+  /* Color: ink/paper base, teal = pass signal, amber = needs-work signal,
+     steel-blue = the "scan line" accent that ties to the ATS-scanning concept */
+  --ink: #14181f;
+  --ink-soft: #2a3140;
+  --muted: #5b6270;
+  --paper: #eceeeb;
+  --paper-raised: #f7f8f6;
+  --line: #d7d9d4;
+
+  --signal-pass: #2f9e8f;
+  --signal-pass-soft: #d9efec;
+  --signal-warn: #d98c3d;
+  --signal-warn-soft: #f6e6d3;
+  --signal-fail: #c0554a;
+  --signal-fail-soft: #f4dedb;
+
+  --scan: #5b7ea3;
+  --scan-glow: rgba(91, 126, 163, 0.35);
+
+  /* Type */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--scan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
