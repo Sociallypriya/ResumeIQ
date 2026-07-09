@@ -3,6 +3,7 @@
 AI-powered resume analyzer that scores resumes for ATS compatibility, flags formatting issues, and surfaces keyword gaps against a target job description — built with the MERN stack and Google Gemini.
 
 **Live app:** [resumeiq-fgu1.onrender.com](https://resumeiq-fgu1.onrender.com)
+**Backend API:** resumeiq-backend-ybu3.onrender.com
 
 ---
 
