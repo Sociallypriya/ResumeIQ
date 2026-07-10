@@ -68,62 +68,61 @@ export default function Analyze() {
         alignment, or leave it blank for general feedback.
       </p>
 
-      <form className="card" onSubmit={handleSubmit}>
-        {error && <div className="form-error">{error}</div>}
+      <div className={result ? "analyze-layout" : ""}>
+        <form className="card" onSubmit={handleSubmit}>
+          {error && <div className="form-error">{error}</div>}
 
-        <div
-          className={`dropzone${dragActive ? " drag-active" : ""}`}
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragActive(true);
-          }}
-          onDragLeave={() => setDragActive(false)}
-          onDrop={handleDrop}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".pdf,.docx"
-            style={{ display: "none" }}
-            onChange={(e) => handleFileChange(e.target.files?.[0])}
-          />
-          {file ? (
-            <div className="dropzone-filename">{file.name}</div>
-          ) : (
-            <>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>
-                Click to choose a file, or drag it here
-              </div>
-              <div className="dropzone-hint">PDF or DOCX, up to 5MB</div>
-            </>
-          )}
-        </div>
+          <div
+            className={`dropzone${dragActive ? " drag-active" : ""}`}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragActive(true);
+            }}
+            onDragLeave={() => setDragActive(false)}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={inputRef}
+              type="file"
+              accept=".pdf,.docx"
+              style={{ display: "none" }}
+              onChange={(e) => handleFileChange(e.target.files?.[0])}
+            />
+            {file ? (
+              <div className="dropzone-filename">{file.name}</div>
+            ) : (
+              <>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>
+                  Click to choose a file, or drag it here
+                </div>
+                <div className="dropzone-hint">PDF or DOCX, up to 5MB</div>
+              </>
+            )}
+          </div>
 
-        <div className="form-field" style={{ marginTop: 20 }}>
-          <label className="form-label" htmlFor="jd">
-            Job description (optional)
-          </label>
-          <textarea
-            id="jd"
-            className="form-textarea"
-            placeholder="Paste the job description to check keyword alignment..."
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-          />
-        </div>
+          <div className="form-field" style={{ marginTop: 20 }}>
+            <label className="form-label" htmlFor="jd">
+              Job description (optional)
+            </label>
+            <textarea
+              id="jd"
+              className="form-textarea"
+              placeholder="Paste the job description to check keyword alignment..."
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              style={result ? { minHeight: 220 } : undefined}
+            />
+          </div>
 
-        <button className="btn-primary" type="submit" disabled={loading}>
-          {loading && <span className="spinner" />}
-          {loading ? "Scanning..." : "Run analysis"}
-        </button>
-      </form>
+          <button className="btn-primary" type="submit" disabled={loading}>
+            {loading && <span className="spinner" />}
+            {loading ? "Scanning..." : "Run analysis"}
+          </button>
+        </form>
 
-      {result && (
-        <div style={{ marginTop: 28 }}>
-          <ResultsPanel data={result} animate />
-        </div>
-      )}
+        {result && <ResultsPanel data={result} animate />}
+      </div>
     </div>
   );
 }
