@@ -5,10 +5,13 @@ import ResultsPanel from "../components/ResultsPanel";
 export default function Analyze() {
   const [file, setFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
+  const [analysisLabel, setAnalysisLabel] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [analyzedFile, setAnalyzedFile] = useState(null);
+  const [analyzedJobDescription, setAnalyzedJobDescription] = useState("");
   const inputRef = useRef(null);
 
   function handleFileChange(selected) {
@@ -40,9 +43,14 @@ export default function Analyze() {
     setError("");
     setLoading(true);
     setResult(null);
+    setAnalyzedFile(null);
+    setAnalyzedJobDescription("");
 
     const formData = new FormData();
     formData.append("resume", file);
+    if (analysisLabel.trim()) {
+      formData.append("analysisLabel", analysisLabel.trim());
+    }
     if (jobDescription.trim()) {
       formData.append("jobDescription", jobDescription.trim());
     }
@@ -52,6 +60,8 @@ export default function Analyze() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(data);
+      setAnalyzedFile(file);
+      setAnalyzedJobDescription(jobDescription.trim());
     } catch (err) {
       setError(err.response?.data?.message || "Analysis failed. Try again.");
     } finally {
@@ -102,6 +112,22 @@ export default function Analyze() {
           </div>
 
           <div className="form-field" style={{ marginTop: 20 }}>
+            <label className="form-label" htmlFor="analysis-label">
+              Analysis name (optional)
+            </label>
+            <input
+              id="analysis-label"
+              className="form-input"
+              type="text"
+              maxLength={80}
+              placeholder="e.g. Frontend Developer — Acme (auto-labeled from job description if blank)"
+              value={analysisLabel}
+              onChange={(e) => setAnalysisLabel(e.target.value)}
+            />
+            <span className="field-hint">Use a role or company to recognize this scan in History.</span>
+          </div>
+
+          <div className="form-field" style={{ marginTop: 20 }}>
             <label className="form-label" htmlFor="jd">
               Job description (optional)
             </label>
@@ -121,7 +147,14 @@ export default function Analyze() {
           </button>
         </form>
 
-        {result && <ResultsPanel data={result} animate />}
+        {result && (
+          <ResultsPanel
+            data={result}
+            animate
+            resumeFile={analyzedFile}
+            jobDescription={analyzedJobDescription}
+          />
+        )}
       </div>
     </div>
   );

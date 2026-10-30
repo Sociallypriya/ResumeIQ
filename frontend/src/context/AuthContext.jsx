@@ -18,15 +18,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (name, email, password) => {
-    const { data } = await apiClient.post("/auth/register", {
+    return apiClient.post("/auth/register", {
       name,
       email,
       password,
     });
-    localStorage.setItem("resumeiq_token", data.token);
-    localStorage.setItem("resumeiq_user", JSON.stringify(data.user));
-    setUser(data.user);
-    return data;
   }, []);
 
   const logout = useCallback(() => {

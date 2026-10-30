@@ -13,11 +13,12 @@ ResumeIQ was built after months of manually iterating on my own resume for job a
 ## Features
 
 - **Resume parsing** — extracts text from PDF and DOCX files
-- **Hybrid scoring engine** — combines deterministic heuristic checks (contact info, section presence, length) with LLM-based semantic analysis via the Gemini API, so the score isn't a black box
+- **Repeatable scoring engine** — ATS score is deterministic keyword coverage against the job description; structural checks cover contact info, sections, and length. Gemini provides written feedback, not the score.
 - **Keyword gap analysis** — compares resume content against a pasted job description
+- **Job-tailored resume drafts** — builds an editable, downloadable draft that emphasizes relevant experience from the source resume without adding unsupported claims
 - **JWT authentication** — register/login, protected routes
 - **Analysis history** — past scans saved per user in MongoDB
-- **Rate limiting** — protects the analysis endpoint from abuse
+- **Rate limiting** — protects the analysis and resume-drafting endpoints from abuse
 
 ## Tech Stack
 
@@ -44,7 +45,7 @@ resumeiq/
 
 ## Design Decisions
 
-- **Heuristic + LLM hybrid score** — heuristic checks are free and deterministic (contact info, section presence, length); the LLM adds semantic understanding of resume quality. Combined 70/30, weighted toward the LLM.
+- **Deterministic score** — ATS score uses unique, meaningful job-description terms found in the resume. The combined score weights keyword coverage at 70% and structural checks at 30%. With no job description, the structural score is used. Gemini is used for written feedback only, so repeated analyses of the same extracted text and job description have the same score.
 - **Structured JSON output** — Gemini is called with `responseMimeType: application/json` and a fixed schema, so the frontend never has to parse free-form text out of a model response.
 - **Files deleted after processing** — uploaded resumes are parsed to text and immediately removed from disk; nothing is stored beyond the extracted analysis.
 - **Configurable API URL** — the frontend reads `VITE_API_URL` at build time, falling back to `localhost:5000` for local development, so the same codebase deploys cleanly to production without code changes.

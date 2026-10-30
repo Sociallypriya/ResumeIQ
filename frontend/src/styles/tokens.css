@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   /* Color: ink/paper base, teal = pass signal, amber = needs-work signal,
      steel-blue = the "scan line" accent that ties to the ATS-scanning concept */
   --ink: #14181f;
@@ -17,6 +18,9 @@
 
   --scan: #5b7ea3;
   --scan-glow: rgba(91, 126, 163, 0.35);
+  --input-bg: #ffffff;
+  --dropzone-bg: #ffffff;
+  --scan-hover-bg: rgba(91, 126, 163, 0.04);
 
   /* Type */
   --font-display: "Space Grotesk", sans-serif;
@@ -25,6 +29,30 @@
 
   --radius: 10px;
   --radius-sm: 6px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink: #f2f4f7;
+  --ink-soft: #d5dbe5;
+  --muted: #aab4c2;
+  --paper: #11161d;
+  --paper-raised: #1b232d;
+  --line: #354150;
+
+  --signal-pass: #73d5c3;
+  --signal-pass-soft: #183a37;
+  --signal-warn: #f1bc78;
+  --signal-warn-soft: #3b2d1e;
+  --signal-fail: #f08f86;
+  --signal-fail-soft: #402523;
+
+  --scan: #8eb9e8;
+  --scan-glow: rgba(142, 185, 232, 0.35);
+  --input-bg: #141b23;
+  --dropzone-bg: #141b23;
+  --scan-hover-bg: rgba(142, 185, 232, 0.08);
 }
 
 * {

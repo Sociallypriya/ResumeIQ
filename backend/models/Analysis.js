@@ -8,6 +8,7 @@ const analysisSchema = new mongoose.Schema(
       required: true,
     },
     fileName: { type: String, required: true },
+    analysisLabel: { type: String, trim: true, maxlength: 80 },
     jobDescriptionProvided: { type: Boolean, default: false },
     atsScore: { type: Number, required: true },
     heuristicScore: { type: Number, required: true },

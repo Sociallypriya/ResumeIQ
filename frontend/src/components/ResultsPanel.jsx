@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import ScoreGauge from "./ScoreGauge";
+import ResumeBuilder from "./ResumeBuilder";
 
-export default function ResultsPanel({ data, animate = true }) {
+export default function ResultsPanel({ data, animate = true, resumeFile, jobDescription }) {
   const [showScan, setShowScan] = useState(animate);
 
   useEffect(() => {
@@ -73,6 +74,10 @@ export default function ResultsPanel({ data, animate = true }) {
           ))}
         </ul>
       </div>
+
+      {resumeFile && (
+        <ResumeBuilder file={resumeFile} jobDescription={jobDescription || ""} />
+      )}
     </div>
   );
 }

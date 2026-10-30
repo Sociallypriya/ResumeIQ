@@ -7,7 +7,10 @@ const path = require("path");
 const { verifyToken } = require("../middleware/auth");
 const { extractResumeText } = require("../utils/parseResume");
 const { runHeuristicChecks } = require("../utils/heuristicChecks");
-const { analyzeResumeWithLLM } = require("../utils/llmAnalyze");
+const {
+  analyzeResumeWithLLM,
+  buildTailoredResumeWithLLM,
+} = require("../utils/llmAnalyze");
 const Analysis = require("../models/Analysis");
 
 const router = express.Router();
@@ -35,6 +38,12 @@ const analyzeLimiter = rateLimit({
   message: { message: "Too many analysis requests. Please try again later." },
 });
 
+const tailorLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: "Too many resume draft requests. Please try again later." },
+});
+
 // POST /api/resume/analyze
 router.post(
   "/analyze",
@@ -50,6 +59,14 @@ router.post(
       filePath = req.file.path;
 
       const jobDescription = req.body.jobDescription || "";
+      const requestedLabel = (req.body.analysisLabel || "").trim();
+      const jobTitle = jobDescription
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^\s*(?:#+|[-*•])\s*/, "").trim())
+        .find((line) => line.length > 0);
+      const analysisLabel = (requestedLabel || jobTitle || "General resume review")
+        .replace(/\s+/g, " ")
+        .slice(0, 80);
 
       // 1. Extract text from PDF/DOCX
       const resumeText = await extractResumeText(filePath, req.file.mimetype);
@@ -61,24 +78,24 @@ router.post(
       }
 
       // 2. Deterministic heuristic checks (fast, free, no API call)
-      const { heuristicScore, heuristicIssues, wordCount } =
-        runHeuristicChecks(resumeText);
+      const { atsScore, heuristicScore, heuristicIssues, wordCount } =
+        runHeuristicChecks(resumeText, jobDescription);
 
       // 3. LLM-based analysis (semantic, context-aware)
       const llmResult = await analyzeResumeWithLLM(resumeText, jobDescription);
 
-      // 4. Combine scores (weighted: LLM understands context better,
-      //    heuristic catches hard structural issues)
+      // 4. Combine deterministic keyword alignment with structural checks.
       const combinedScore = Math.round(
-        llmResult.atsScore * 0.7 + heuristicScore * 0.3
+        atsScore * 0.7 + heuristicScore * 0.3
       );
 
       // 5. Persist to history
       const savedAnalysis = await Analysis.create({
         user: req.user.id,
         fileName: req.file.originalname,
+        analysisLabel: analysisLabel || undefined,
         jobDescriptionProvided: Boolean(jobDescription),
-        atsScore: llmResult.atsScore,
+        atsScore,
         heuristicScore,
         combinedScore,
         summary: llmResult.summary,
@@ -91,8 +108,9 @@ router.post(
 
       res.json({
         analysisId: savedAnalysis._id,
+        analysisLabel: savedAnalysis.analysisLabel,
         combinedScore,
-        atsScore: llmResult.atsScore,
+        atsScore,
         heuristicScore,
         wordCount,
         summary: llmResult.summary,
@@ -107,6 +125,44 @@ router.post(
       res.status(500).json({ message: "Analysis failed.", error: err.message });
     } finally {
       // Always clean up the uploaded file from disk
+      if (filePath && fs.existsSync(filePath)) {
+        fs.unlink(filePath, () => {});
+      }
+    }
+  }
+);
+
+// POST /api/resume/tailor
+router.post(
+  "/tailor",
+  verifyToken,
+  tailorLimiter,
+  upload.single("resume"),
+  async (req, res) => {
+    let filePath;
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Please upload your resume again to build a tailored draft." });
+      }
+      filePath = req.file.path;
+      const jobDescription = (req.body.jobDescription || "").trim();
+      if (!jobDescription) {
+        return res.status(400).json({ message: "Add a job description to build a tailored resume." });
+      }
+
+      const resumeText = await extractResumeText(filePath, req.file.mimetype);
+      if (resumeText.length < 50) {
+        return res.status(422).json({
+          message: "Could not extract meaningful text. Try a different file.",
+        });
+      }
+
+      const draft = await buildTailoredResumeWithLLM(resumeText, jobDescription);
+      res.json({ draft });
+    } catch (err) {
+      console.error("Resume tailoring error:", err);
+      res.status(500).json({ message: "Could not build the tailored resume. Please try again." });
+    } finally {
       if (filePath && fs.existsSync(filePath)) {
         fs.unlink(filePath, () => {});
       }

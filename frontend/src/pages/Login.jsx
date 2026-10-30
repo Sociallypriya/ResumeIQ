@@ -26,7 +26,6 @@ export default function Login() {
 
   return (
     <div className="page page-narrow">
-      <p className="eyebrow">Sign in</p>
       <h1 className="page-title">Welcome back</h1>
       <p className="page-subtitle">Log in to analyze your resume.</p>
 

@@ -17,7 +17,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(name, email, password);
-      navigate("/analyze");
+      navigate("/login", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Try again.");
     } finally {
@@ -27,7 +27,6 @@ export default function Register() {
 
   return (
     <div className="page page-narrow">
-      <p className="eyebrow">Create account</p>
       <h1 className="page-title">Get started</h1>
       <p className="page-subtitle">Create an account to start analyzing resumes.</p>
 

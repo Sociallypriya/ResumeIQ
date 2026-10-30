@@ -20,16 +20,7 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashedPassword });
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.status(201).json({
-      token,
-      user: { id: user._id, name: user.name, email: user.email },
-    });
+    res.status(201).json({ message: "Account created. Please log in." });
   } catch (err) {
     res.status(500).json({ message: "Registration failed.", error: err.message });
   }

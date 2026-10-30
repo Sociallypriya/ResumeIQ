@@ -37,21 +37,28 @@ export default function History() {
           Run your first analysis to see it appear here.
         </div>
       ) : (
-        history.map((item) => (
-          <Link className="history-item" to={`/history/${item._id}`} key={item._id}>
-            <div className="history-meta">
-              <span className="history-filename">{item.fileName}</span>
-              <span className="history-date">
-                {new Date(item.createdAt).toLocaleDateString(undefined, {
+        history.map((item) => {
+          const analyzedAt = new Date(item.createdAt).toLocaleString(undefined, {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
-                })}
+                  hour: "numeric",
+                  minute: "2-digit",
+                });
+          return (
+            <Link className="history-item" to={`/history/${item._id}`} key={item._id}>
+              <div className="history-meta">
+                <span className="history-filename">{item.analysisLabel || "Resume analysis"}</span>
+                <span className="history-file">{item.fileName}</span>
+                <span className="history-date">{analyzedAt}</span>
+              </div>
+              <span className="history-score">
+                <small>Score</small>
+                {item.combinedScore}
               </span>
-            </div>
-            <span className="history-score">{item.combinedScore}</span>
-          </Link>
-        ))
+            </Link>
+          );
+        })
       )}
     </div>
   );

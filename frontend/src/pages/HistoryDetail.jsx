@@ -30,9 +30,11 @@ export default function HistoryDetail() {
           ← History
         </Link>
       </p>
-      <h1 className="page-title">{data?.fileName || "Analysis"}</h1>
+      <h1 className="page-title">{data?.analysisLabel || data?.fileName || "Analysis"}</h1>
       <p className="page-subtitle">
-        {data ? new Date(data.createdAt).toLocaleString() : ""}
+        {data
+          ? `${data.fileName} · ${new Date(data.createdAt).toLocaleString()}`
+          : ""}
       </p>
 
       {error && <div className="form-error">{error}</div>}
