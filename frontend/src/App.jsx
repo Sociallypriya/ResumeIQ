@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Analyze from "./pages/Analyze";
 import History from "./pages/History";
 import HistoryDetail from "./pages/HistoryDetail";
+import Profile from "./pages/Profile";
 
 export default function App() {
   const [theme, setTheme] = useState(() => {
@@ -59,6 +60,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <HistoryDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />

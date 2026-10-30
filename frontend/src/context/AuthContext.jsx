@@ -25,6 +25,11 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  const updateUser = useCallback((nextUser) => {
+    localStorage.setItem("resumeiq_user", JSON.stringify(nextUser));
+    setUser(nextUser);
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("resumeiq_token");
     localStorage.removeItem("resumeiq_user");
@@ -32,7 +37,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
